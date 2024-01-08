@@ -1,12 +1,12 @@
 <?php
 
 /**
- * @package       JED
+ * @package JED
  *
- * @subpackage    VEL
+ * @subpackage VEL
  *
- * @copyright     (C) 2022 Open Source Matters, Inc.  <https://www.joomla.org>
- * @license       GNU General Public License version 2 or later; see LICENSE.txt
+ * @copyright (C) 2022 Open Source Matters, Inc.  <https://www.joomla.org>
+ * @license   GNU General Public License version 2 or later; see LICENSE.txt
  */
 
 namespace Jed\Component\Jed\Site\Controller;
@@ -16,8 +16,6 @@ namespace Jed\Component\Jed\Site\Controller;
 // phpcs:enable PSR1.Files.SideEffects
 
 use Joomla\CMS\MVC\Controller\FormController;
-
-use function defined;
 
 /**
  * VEL Patched Items Controller Class.
@@ -29,11 +27,11 @@ class VelpatcheditemsController extends FormController
     /**
      * Proxy for getModel.
      *
-     * @param   string  $name    The model name. Optional.
-     * @param   string  $prefix  The class prefix. Optional
-     * @param   array   $config  Configuration array for model. Optional
+     * @param string $name   The model name. Optional.
+     * @param string $prefix The class prefix. Optional
+     * @param array  $config Configuration array for model. Optional
      *
-     * @return  object    The model
+     * @return object    The model
      *
      * @since 4.0.0
      */

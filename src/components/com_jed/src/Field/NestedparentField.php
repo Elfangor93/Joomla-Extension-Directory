@@ -1,10 +1,10 @@
 <?php
 
 /**
- * @package    JED
+ * @package JED
  *
- * @copyright  (C) 2022 Open Source Matters, Inc.  <https://www.joomla.org>
- * @license    GNU General Public License version 2 or later; see LICENSE.txt
+ * @copyright (C) 2022 Open Source Matters, Inc.  <https://www.joomla.org>
+ * @license   GNU General Public License version 2 or later; see LICENSE.txt
  */
 
 namespace Jed\Component\Jed\Site\Field;
@@ -13,7 +13,7 @@ namespace Jed\Component\Jed\Site\Field;
 \defined('_JEXEC') or die;
 // phpcs:enable PSR1.Files.SideEffects
 
-use JError;
+use Exception;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Form\Field\ListField;
 use RuntimeException;
@@ -21,31 +21,32 @@ use RuntimeException;
 /**
  * Supports an HTML select list of categories
  *
- * @since  4.0.0
+ * @since 4.0.0
  */
 class NestedparentField extends ListField
 {
     /**
      * The form field type.
      *
-     * @var    string
-     * @since  4.0.0
+     * @var   string
+     * @since 4.0.0
      */
     protected $type = 'nestedparent';
 
     /**
      * Method to get the field options.
      *
-     * @return  array  The field option objects.
+     * @return array  The field option objects.
      *
-     * @since   4.0.0
+     * @throws Exception
+     * @since 4.0.0
      */
-    protected function getOptions()
+    protected function getOptions(): array
     {
         $options = [];
         $table   = $this->getAttribute('table');
 
-        $db    = Factory::getDbo();
+        $db    = Factory::getContainer()->get('DatabaseDriver');
         $query = $db->getQuery(true)
             ->select('DISTINCT(a.id) AS value, a.title AS text, a.level, a.lft')
             ->from($table . ' AS a');
@@ -65,7 +66,7 @@ class NestedparentField extends ListField
         try {
             $options = $db->loadObjectList();
         } catch (RuntimeException $e) {
-            JError::raiseWarning(500, $e->getMessage());
+            throw new Exception($e->getMessage(), 500);
         }
 
         // Pad the option text with spaces using depth level as a multiplier.
@@ -74,8 +75,6 @@ class NestedparentField extends ListField
         }
 
         // Merge any additional options in the XML definition.
-        $options = array_merge(parent::getOptions(), $options);
-
-        return $options;
+        return array_merge(parent::getOptions(), $options);
     }
 }

@@ -1,31 +1,30 @@
 <?php
 
 /**
- * @package    JED
+ * @package JED
  *
- * @copyright  (C) 2022 Open Source Matters, Inc.  <https://www.joomla.org>
- * @license    GNU General Public License version 2 or later; see LICENSE.txt
+ * @copyright (C) 2022 Open Source Matters, Inc.  <https://www.joomla.org>
+ * @license   GNU General Public License version 2 or later; see LICENSE.txt
  */
 
 namespace Jed\Component\Jed\Site\Helper;
 
 // phpcs:disable PSR1.Files.SideEffects
-\defined('_JEXEC') or die;
+defined('_JEXEC') or die;
 // phpcs:enable PSR1.Files.SideEffects
 
 use Exception;
 use Jed\Component\Jed\Administrator\MediaHandling\ImageSize;
 use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Factory;
-use Joomla\CMS\Filesystem\File;
 use Joomla\CMS\Uri\Uri;
 use Joomla\CMS\User;
 
 /**
  * JED Helper
  *
- * @package   JED
- * @since     4.0.0
+ * @package JED
+ * @since   4.0.0
  */
 class JedHelper
 {
@@ -34,15 +33,16 @@ class JedHelper
      *
      * @return User\User
      *
-     * @since    4.0.0
+     * @throws Exception
+     * @since 4.0.0
      */
     public static function getUser(): User\User
     {
-        //$user   = Factory::getUser();
         $app = null;
         try {
             $app = Factory::getApplication();
         } catch (Exception $e) {
+            throw new Exception($e->getMessage(), $e->getCode());
         }
         return $app->getSession()->get('user');
     }
@@ -54,7 +54,7 @@ class JedHelper
      *
      * @return User\User
      *
-     * @since    4.0.0
+     * @since 4.0.0
      */
     public static function getUserById($userId): User\User
     {
@@ -65,7 +65,7 @@ class JedHelper
             $userFactory = $container->get('user.factory');
 
             return $userFactory->loadUserById($userId);
-        } catch (Exception $e) {
+        } catch (Exception) {
             return new User\User();
         }
     }
@@ -75,10 +75,10 @@ class JedHelper
     /**
      * For a new review this creates a corresponding Ticket
      *
-     * @param   int  $item_id      Reference for stored report
+     * @param int $item_id Reference for stored report
      *
-     * @return  array  Ticket Template
-     * @since 4.0.0
+     * @return array  Ticket Template
+     * @since  4.0.0
      *
      * @throws Exception
      */
@@ -90,7 +90,7 @@ class JedHelper
 
         $ticket = [];
 
-        $user = JedHelper::getUser();
+        $user = Factory::getApplication()->getIdentity();
 
         $ticket['id']               = 0;
         $ticket['created_by']       = $user->id;
@@ -145,7 +145,7 @@ class JedHelper
          <option value="4">Vulnerable Item Initial Report</option>
          <option value="5">Vulnerable Item Developer Update</option>
          <option value="6">Abandonware Report</option>
-//       <option value="7">Vulnerable Item Email Correspondence</option> */
+        //       <option value="7">Vulnerable Item Email Correspondence</option> */
 
 
         $ticket['ticket_status'] = 0; //New
@@ -168,11 +168,10 @@ class JedHelper
 
 
         foreach ($ticket as $k => $v) {
-            $columns[] = $k;
             if (str_ends_with($k, "_on")) {
-                $values[] = $v;
+                $ticket[$k] = $v;
             } else {
-                $values[] = $db->quote($v);
+                $ticket[$k] = $db->quote($v);
             }
         }
 
@@ -182,11 +181,11 @@ class JedHelper
     /**
      * When a VEL is reported or a Developer Update or Abandoned Item reported  this creates a corresponding Ticket
      *
-     * @param   int  $report_type  1 for VEL REPORT, 2 for DEVELOPER UPDATE, 3 for ABANDONWARE REPORT
-     * @param   int  $item_id      Reference for stored report
+     * @param int $report_type 1 for VEL REPORT, 2 for DEVELOPER UPDATE, 3 for ABANDONWARE REPORT
+     * @param int $item_id     Reference for stored report
      *
-     * @return  array  Ticket Template
-     * @since 4.0.0
+     * @return array  Ticket Template
+     * @since  4.0.0
      *
      * @throws Exception
      */
@@ -198,7 +197,7 @@ class JedHelper
 
         $ticket = [];
 
-        $user = JedHelper::getUser();
+        $user = Factory::getApplication()->getIdentity();
 
         $ticket['id']               = 0;
         $ticket['created_by']       = $user->id;
@@ -266,7 +265,7 @@ class JedHelper
          <option value="4">Vulnerable Item Initial Report</option>
          <option value="5">Vulnerable Item Developer Update</option>
          <option value="6">Abandonware Report</option>
-//       <option value="7">Vulnerable Item Email Correspondence</option> */
+        //       <option value="7">Vulnerable Item Email Correspondence</option> */
 
 
         $ticket['ticket_status'] = 0; //New
@@ -287,16 +286,6 @@ class JedHelper
         $ticket['allocated_to']            = 0;
         $ticket['parent_id']               = -1;
 
-
-        foreach ($ticket as $k => $v) {
-            $columns[] = $k;
-            if (str_ends_with($k, "_on")) {
-                $values[] = $v;
-            } else {
-                $values[] = $db->quote($v);
-            }
-        }
-
         return $ticket;
     }
 
@@ -305,11 +294,12 @@ class JedHelper
      *
      * @return array
      *
+     * @throws Exception
      * @since 4.0.0
      */
     public static function CreateEmptyTicketMessage(): array
     {
-        $user                               = JedHelper::getUser();
+        $user                               = Factory::getApplication()->getIdentity();
         $ticket_message                     = [];
         $ticket_message['id']               = 0;
         $ticket_message['created_by']       = $user->id;
@@ -326,7 +316,7 @@ class JedHelper
     /**
      * Get Message Template from Database and return
      *
-     * @param   int  $template_id
+     * @param int $template_id
      *
      * @return object
      *
@@ -349,16 +339,17 @@ class JedHelper
     /**
      * IsLoggedIn
      *
-     * Returns if user is logged in
+     * Returns if user is logged-in
      *
      * @return bool
      *
+     * @throws Exception
      * @since 4.0.0
      */
     public static function IsLoggedIn(): bool
     {
 
-        $user = JedHelper::getUser();
+        $user = Factory::getApplication()->getIdentity();
         if ($user->id > 0) {
             return true;
         } else {
@@ -371,26 +362,21 @@ class JedHelper
      *
      * @param   mixed  $item  The item
      *
-     * @return  bool
+     * @return bool
      *
-     * @since   4.0.0
+     * @throws Exception
+     * @since 4.0.0
      */
-    public static function canUserEdit($item): bool
+    public static function canUserEdit(mixed $item): bool
     {
 
-        $permission = false;
-        $user       = JedHelper::getUser();
+        $permission = true;
+        $user       = Factory::getApplication()->getIdentity();
 
         if ($user->authorise('core.edit', 'com_jed')) {
             $permission = true;
-        } else {
-            if (isset($item->created_by)) {
-                if ($item->created_by == $user->id) {
-                    $permission = true;
-                }
-            } else {
-                $permission = true;
-            }
+        } elseif (isset($item->created_by)) {
+            $permission = true;
         }
 
         return $permission;
@@ -399,12 +385,12 @@ class JedHelper
     /**
      * Function to format JED Extension Images
      *
-     * @param   string  $filename  The image filename
-     * @param   string  $size      Size of image, small|large
+     * @param string    $filename The image filename
+     * @param ImageSize $size     Size of image, small|large
      *
-     * @return  string  Full image url
+     * @return string  Full image url
      *
-     * @since   4.0.0
+     * @since 4.0.0
      */
     public static function formatImage(string $filename, ImageSize $size = ImageSize::SMALL): string
     {
@@ -431,7 +417,7 @@ class JedHelper
         // TODO Check if the resized file exists; if not resize it
 
         // TODO If the file cannot be resized AND I am configured to use a CDN, fall back to the legacy CDN URLs
-        if (false && $params->get('use_cdn', 0)) {
+        if ($params->get('use_cdn', 0)) {
             $bestFilename = match ($size) {
                 ImageSize::ORIGINAL => $filename,
                 ImageSize::SMALL    => $partialName . '_resizeDown400px175px16' . $extension,
@@ -447,19 +433,19 @@ class JedHelper
         }
 
         // No CDN (e.g. local development). Where should I get my image from?
-        if (File::exists(JPATH_ROOT . '/' . ltrim($bestFilename, '/\\'))) {
+        if (file_exists(JPATH_ROOT . '/' . ltrim($bestFilename, '/\\'))) {
             return Uri::root() . ltrim($bestFilename, '/\\');
         }
 
-        if (File::exists(JPATH_ROOT . '/' . ltrim($filename, '/\\'))) {
+        if (file_exists(JPATH_ROOT . '/' . ltrim($filename, '/\\'))) {
             return Uri::root() . ltrim($filename, '/\\');
         }
 
-        if (File::exists(JPATH_ROOT . '/media/com_jed/cache/' . ltrim($bestFilename, '/\\'))) {
+        if (file_exists(JPATH_ROOT . '/media/com_jed/cache/' . ltrim($bestFilename, '/\\'))) {
             return Uri::root() . 'media/com_jed/' . ltrim($bestFilename, '/\\');
         }
 
-        if (File::exists(JPATH_ROOT . '/media/com_jed/cache/' . ltrim($filename, '/\\'))) {
+        if (file_exists(JPATH_ROOT . '/media/com_jed/cache/' . ltrim($filename, '/\\'))) {
             return Uri::root() . 'media/com_jed/' . ltrim($filename, '/\\');
         }
 
@@ -482,27 +468,28 @@ class JedHelper
     }
 
     /**
-     * Checks whether or not a user is manager or super user
+     * Checks whether a user is manager or superuser
      *
      * @return bool
      *
+     * @throws Exception
      * @since 4.0.0
      */
     public static function isAdminOrSuperUser(): bool
     {
         try {
-            $user = JedHelper::getUser();
+            $user = Factory::getApplication()->getIdentity();
 
             return in_array("8", $user->groups) || in_array("7", $user->groups);
         } catch (Exception $exc) {
-            return false;
+            throw new Exception($exc->getMessage(), $exc->getCode());
         }
     }
 
     /**
      * Checks if a given date is valid and in a specified format (YYYY-MM-DD)
      *
-     * @param   string  $date  Date to be checked
+     * @param string $date Date to be checked
      *
      * @return bool
      *
@@ -555,16 +542,17 @@ class JedHelper
     /**
      * This method advises if the $id of the item belongs to the current user
      *
-     * @param   integer  $id     The id of the item
-     * @param   string   $table  The name of the table
+     * @param   int     $id     The id of the item
+     * @param   string  $table  The name of the table
      *
-     * @return  boolean             true if the user is the owner of the row, false if not.
-     * @since   4.0.0
+     * @return bool             true if the user is the owner of the row, false if not.
+     * @throws Exception
+     * @since  4.0.0
      */
     public static function userIDItem(int $id, string $table): bool
     {
         try {
-            $user = JedHelper::getUser();
+            $user = Factory::getApplication()->getIdentity();
             $db   = Factory::getContainer()->get('DatabaseDriver');
 
             $query = $db->getQuery(true);
@@ -582,30 +570,44 @@ class JedHelper
                 return false;
             }
         } catch (Exception $exc) {
-            return false;
+            throw new Exception($exc->getMessage(), $exc->getCode());
         }
     }
 
     /**
      * This method returns whether an alias is available for the view
      *
-     *  @param   string   $view  The name of the view
+     * @param string $view The name of the view
      *
-     * @return  string
-     * @since   4.0.0
+     * @return string
+     * @since  4.0.0
      */
     public static function getAliasFieldNameByView(string $view): string
     {
-        switch ($view) {
-            case 'extension':
-            case 'extensionform':
-                return 'alias';
-                break;
-            case 'review':
-            case 'reviewform':
-                return 'alias';
-                break;
+        return match ($view) {
+            'extension', 'extensionform', 'review', 'reviewform' => 'alias',
+            default => "",
+        };
+    }
+
+    /**
+     * if User is logged in then can save data
+     *
+     * @since 4.0.0
+     *
+     * @throws Exception
+     */
+    public static function canSave(): bool
+    {
+        try {
+            $user = Factory::getApplication()->getIdentity();
+            if ($user->id <> null) {
+                //user must be logged in
+                return true;
+            }
+        } catch (Exception $exc) {
+            throw new Exception($exc->getMessage(), $exc->getCode());
         }
-        return "";
+        return false;
     }
 }

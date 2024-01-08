@@ -1,10 +1,10 @@
 <?php
 
 /**
- * @package        JED
+ * @package JED
  *
- * @copyright  (C) 2022 Open Source Matters, Inc.  <https://www.joomla.org>
- * @license        GNU General Public License version 2 or later; see LICENSE.txt
+ * @copyright (C) 2022 Open Source Matters, Inc.  <https://www.joomla.org>
+ * @license   GNU General Public License version 2 or later; see LICENSE.txt
  */
 
 namespace Jed\Component\Jed\Site\Service;
@@ -13,7 +13,6 @@ namespace Jed\Component\Jed\Site\Service;
 \defined('_JEXEC') or die;
 // phpcs:enable PSR1.Files.SideEffects
 
-use Joomla\CMS\Application\CMSApplication;
 use Joomla\CMS\Application\SiteApplication;
 use Joomla\CMS\Categories\CategoryFactoryInterface;
 use Joomla\CMS\Categories\CategoryInterface;
@@ -29,13 +28,11 @@ use Joomla\Database\DatabaseAwareTrait;
 use Joomla\Database\DatabaseInterface;
 use Joomla\Database\ParameterType;
 
-use function defined;
-
 /**
  * JED Router.
  *
- * @package   JED
- * @since     4.0.0
+ * @package JED
+ * @since   4.0.0
  */
 class Router extends RouterView
 {
@@ -58,15 +55,19 @@ class Router extends RouterView
      */
     private CategoryFactoryInterface $categoryFactory;
 
+
     /**
      * Class constructor.
      *
-     * @param   CMSApplication  $app   Application-object that the router should use
-     * @param   AbstractMenu    $menu  Menu-object that the router should use
+     * @param   SiteApplication           $app   Application-object that the router should use
+     * @param   AbstractMenu              $menu  Menu-object that the router should use
+     * @param   DatabaseInterface         $db
+     * @param   MVCFactory                $factory
+     * @param   CategoryFactoryInterface  $categoryFactory
      *
-     * @since   3.4
+     * @since 3.4
      */
-    public function __construct(SiteApplication $app = null, AbstractMenu $menu, DatabaseInterface $db, MVCFactory $factory, CategoryFactoryInterface $categoryFactory)
+    public function __construct(SiteApplication $app, AbstractMenu $menu, DatabaseInterface $db, MVCFactory $factory, CategoryFactoryInterface $categoryFactory)
     {
         parent::__construct($app, $menu);
 
@@ -180,13 +181,13 @@ class Router extends RouterView
     /**
      * Method to get the segment(s) for a category
      *
-     * @param   string  $segment  Segment to retrieve the ID for
-     * @param   array   $query    The request that is parsed right now
+     * @param string $segment Segment to retrieve the ID for
+     * @param array  $query   The request that is parsed right now
      *
-     * @return  mixed   The id of this item or false
-     * @since   4.0.0
+     * @return int|bool   The id of this item or false
+     * @since  4.0.0
      */
-    public function getCategoriesId(string $segment, array $query): int|bool|null
+    public function getCategoriesId(string $segment, array $query): int|bool
     {
         return $this->getCategoryId($segment, $query);
     }
@@ -194,11 +195,11 @@ class Router extends RouterView
     /**
      * Method to get the segment(s) for a category
      *
-     * @param   string  $id     ID of the category to retrieve the segments for
-     * @param   array   $query  The request that is built right now
+     * @param string $id    ID of the category to retrieve the segments for
+     * @param array  $query The request that is built right now
      *
-     * @return  array|string  The segments of this item
-     * @since   4.0.0
+     * @return array|string  The segments of this item
+     * @since  4.0.0
      */
     public function getCategoriesSegment(string $id, array $query): array|string
     {
@@ -208,13 +209,13 @@ class Router extends RouterView
     /**
      * Method to get the id for a category
      *
-     * @param   string  $segment  Segment to retrieve the ID for
-     * @param   array   $query    The request that is parsed right now
+     * @param string $segment Segment to retrieve the ID for
+     * @param array  $query   The request that is parsed right now
      *
-     * @return  mixed   The id of this item or false
-     * @since   4.0.0
+     * @return int|bool   The id of this item or false
+     * @since  4.0.0
      */
-    public function getCategoryId(string $segment, array $query): int|bool|null
+    public function getCategoryId(string $segment, array $query): int|bool
     {
         $id = $query['id'] ?? 'root';
 
@@ -236,11 +237,11 @@ class Router extends RouterView
     /**
      * Method to get the segment(s) for a category
      *
-     * @param   string  $id     ID of the category to retrieve the segments for
-     * @param   array   $query  The request that is built right now
+     * @param string $id    ID of the category to retrieve the segments for
+     * @param array  $query The request that is built right now
      *
-     * @return  array|string  The segments of this item
-     * @since   4.0.0
+     * @return array|string  The segments of this item
+     * @since  4.0.0
      */
     public function getCategorySegment(string $id, array $query): array|string
     {
@@ -292,9 +293,9 @@ class Router extends RouterView
         $db        = $this->getDatabase();
         $query     = $db->getQuery(true);
         $query->select($db->quoteName('alias'))
-              ->from($db->quoteName('#__jed_extensions'))
-              ->where($db->quoteName('id') . ' = :id')
-              ->bind(':id', $id, ParameterType::INTEGER);
+            ->from($db->quoteName('#__jed_extensions'))
+            ->where($db->quoteName('id') . ' = :id')
+            ->bind(':id', $id, ParameterType::INTEGER);
         $db->setQuery($query);
 
         $id .= ':' . $db->loadResult();
@@ -331,11 +332,11 @@ class Router extends RouterView
     /**
      * Method to get categories from cache
      *
-     * @param   array  $options  The options for retrieving categories
+     * @param array $options The options for retrieving categories
      *
-     * @return  CategoryInterface  The object containing categories
+     * @return CategoryInterface  The object containing categories
      *
-     * @since   4.0.0
+     * @since 4.0.0
      */
     private function getCategories(array $options = []): CategoryInterface
     {

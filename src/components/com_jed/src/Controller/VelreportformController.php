@@ -1,12 +1,12 @@
 <?php
 
 /**
- * @package       JED
+ * @package JED
  *
- * @subpackage    VEL
+ * @subpackage VEL
  *
- * @copyright     (C) 2022 Open Source Matters, Inc.  <https://www.joomla.org>
- * @license       GNU General Public License version 2 or later; see LICENSE.txt
+ * @copyright (C) 2022 Open Source Matters, Inc.  <https://www.joomla.org>
+ * @license   GNU General Public License version 2 or later; see LICENSE.txt
  */
 
 namespace Jed\Component\Jed\Site\Controller;
@@ -21,8 +21,6 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Controller\FormController;
 use Joomla\CMS\Router\Route;
 
-use function defined;
-
 /**
  * VEL Report Form Controller Class.
  *
@@ -33,7 +31,7 @@ class VelreportformController extends FormController
     /**
      * Method to abort current operation
      *
-     * @param   null  $key
+     * @param null $key
      *
      * @return void
      *
@@ -41,7 +39,7 @@ class VelreportformController extends FormController
      *
      * @throws Exception
      */
-    public function cancel($key = null)
+    public function cancel($key = null): void
     {
         $app = Factory::getApplication();
 
@@ -63,10 +61,10 @@ class VelreportformController extends FormController
     }
 
     /**
-     * Method to check out an report form for editing and redirect to the edit form.
+     * Method to check out a report form for editing and redirect to the edit form.
      *
-     * @param   null  $key
-     * @param   null  $urlVar
+     * @param null $key
+     * @param null $urlVar
      *
      * @return void
      *
@@ -74,7 +72,7 @@ class VelreportformController extends FormController
      *
      * @throws Exception
      */
-    public function edit($key = null, $urlVar = null)
+    public function edit($key = null, $urlVar = null): void
     {
         $app = Factory::getApplication();
 
@@ -105,15 +103,15 @@ class VelreportformController extends FormController
     /**
      * Method to save data.
      *
-     * @param   null  $key
-     * @param   null  $urlVar
+     * @param null $key
+     * @param null $urlVar
      *
      * @return void
      *
-     * @since 4.0.0
+     * @since  4.0.0
      * @throws Exception
      */
-    public function save($key = null, $urlVar = null)
+    public function save($key = null, $urlVar = null): void
     {
         // Check for request forgeries.
         $this->checkToken();
@@ -200,9 +198,8 @@ class VelreportformController extends FormController
      *
      * @return void
      *
-     * @since 4.0.0
+     * @since  4.0.0
      * @throws Exception
-     *
      */
     /*public function remove()
     {

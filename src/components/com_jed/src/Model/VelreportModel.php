@@ -1,12 +1,12 @@
 <?php
 
 /**
- * @package       JED
+ * @package JED
  *
- * @subpackage    VEL
+ * @subpackage VEL
  *
- * @copyright     (C) 2022 Open Source Matters, Inc.  <https://www.joomla.org>
- * @license       GNU General Public License version 2 or later; see LICENSE.txt
+ * @copyright (C) 2022 Open Source Matters, Inc.  <https://www.joomla.org>
+ * @license   GNU General Public License version 2 or later; see LICENSE.txt
  */
 
 namespace Jed\Component\Jed\Site\Model;
@@ -23,17 +23,27 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Model\ItemModel;
 use Joomla\CMS\Table\Table;
 use Joomla\Utilities\ArrayHelper;
-
-use function defined;
+use stdClass;
 
 /**
  * VEL Report Model Class.
  *
- * @since  4.0
+ * @since 4.0.0
  */
 class VelreportModel extends ItemModel
 {
-    /** Data Table
+    /**
+     * The item object
+     *
+     * @var   mixed
+     * @since 4.0.0
+     */
+    private mixed $item = null;
+
+    /**
+     *
+     * Data Table
+     *
      * @since 4.0.0
      **/
     private string $dbtable = "#__jed_vel_report";
@@ -41,9 +51,9 @@ class VelreportModel extends ItemModel
     /**
      * Method to check in an item.
      *
-     * @param   int|null  $id  The id of the row to check out.
+     * @param int|null $id The id of the row to check out.
      *
-     * @return  boolean True on success, false on failure.
+     * @return bool True on success, false on failure.
      *
      * @since 4.0.0
      *
@@ -75,14 +85,14 @@ class VelreportModel extends ItemModel
     /**
      * Method to get a single record.
      *
-     * @param   int|null  $pk  The id of the object to get.
+     * @param int|null $pk The id of the object to get.
      *
-     * @return  object    Object on success, false on failure.
+     * @return mixed    Object on success, false on failure.
      *
-     * @since 4.0.0
+     * @since  4.0.0
      * @throws Exception
      */
-    public function getItem($pk = null)
+    public function getItem($pk = null): mixed
     {
         $app = Factory::getApplication();
         if ($this->item === null) {
@@ -96,7 +106,7 @@ class VelreportModel extends ItemModel
             $table = $this->getTable();
 
             // Attempt to load the row.
-            $keys = ["id" => $pk, "created_by" => JedHelper::getUser()->id];
+            $keys = ["id" => $pk, "created_by" => Factory::getApplication()->getIdentity()->id];
 
             if ($table->load($keys)) {
                 if (empty($result) || JedHelper::isAdminOrSuperUser()) {
@@ -110,14 +120,13 @@ class VelreportModel extends ItemModel
                     }
 
                     // Convert the JTable to a clean JObject.
-                    $properties = $table->getProperties(1);
+                    $properties = $table->getTableProperties(1);
 
-                    $this->item = ArrayHelper::toObject($properties, 'JObject');
+                    $this->item = ArrayHelper::toObject($properties, stdClass::class);
                 } else {
                     $app->enqueueMessage("Sorry you did not create that report item", "message");
 
                     return null;
-                    //throw new Exception(Text::_("JERROR_ALERTNOAUTHOR"), 401);
                 }
             }
 
@@ -179,12 +188,12 @@ class VelreportModel extends ItemModel
     /**
      * Get an instance of Table class
      *
-     * @param   string  $name
-     * @param   string  $prefix  Prefix for the table class name. Optional.
-     * @param   array   $options
+     * @param string $name
+     * @param string $prefix  Prefix for the table class name. Optional.
+     * @param array  $options
      *
-     * @return  Table Table if success, throws exception on failure.
-     * @since 4.0.0
+     * @return Table Table if success, throws exception on failure.
+     * @since  4.0.0
      * @throws Exception
      */
     public function getTable($name = 'Velreport', $prefix = 'Administrator', $options = []): Table
@@ -193,7 +202,7 @@ class VelreportModel extends ItemModel
     }
 
     /**
-     * Method to auto-populate the model state.
+     * Method to autopopulate the model state.
      *
      * Note. Calling getState in this method will result in recursion.
      *
@@ -203,10 +212,10 @@ class VelreportModel extends ItemModel
      *
      * @throws Exception
      */
-    protected function populateState()
+    protected function populateState(): void
     {
         $app  = Factory::getApplication();
-        $user = JedHelper::getUser();
+        $user = Factory::getApplication()->getIdentity();
 
         // Check published state
         if ((!$user->authorise('core.edit.state', 'com_jed')) && (!$user->authorise('core.edit', 'com_jed'))) {

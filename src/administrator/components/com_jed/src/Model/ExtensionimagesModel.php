@@ -1,10 +1,10 @@
 <?php
 
 /**
- * @package        JED
+ * @package JED
  *
- * @copyright  (C) 2022 Open Source Matters, Inc.  <https://www.joomla.org>
- * @license        GNU General Public License version 2 or later; see LICENSE.txt
+ * @copyright (C) 2022 Open Source Matters, Inc.  <https://www.joomla.org>
+ * @license   GNU General Public License version 2 or later; see LICENSE.txt
  */
 
 namespace Jed\Component\Jed\Administrator\Model;
@@ -16,6 +16,7 @@ namespace Jed\Component\Jed\Administrator\Model;
 
 use Exception;
 use Jed\Component\Jed\Administrator\Helper\JedHelper;
+use Joomla\CMS\Factory;
 use Joomla\CMS\MVC\Model\ListModel;
 use Joomla\Component\Fields\Administrator\Helper\FieldsHelper;
 use Joomla\Database\QueryInterface;
@@ -23,23 +24,23 @@ use Joomla\Database\QueryInterface;
 /**
  * Methods supporting a list of Extensionimages records.
  *
- * @since  4.0.0
+ * @since 4.0.0
  */
 class ExtensionimagesModel extends ListModel
 {
     /**
      * Constructor.
      *
-     * @param   array  $config  An optional associative array of configuration settings.
+     * @param array $config An optional associative array of configuration settings.
      *
-     * @see           ListModel
-     * @throws  Exception
-     * @since         4.0.0
+     * @see    ListModel
+     * @throws Exception
+     * @since  4.0.0
      */
     public function __construct($config = [])
     {
         if (empty($config['filter_fields'])) {
-            $config['filter_fields'] = ['id', 'a.id', 'state', 'a.state', 'ordering', 'a.ordering', 'created_by', 'a.created_by', 'modified_by', 'a.modified_by', 'extension_id', 'a.extension_id', 'filename', 'a.filename',];
+            $config['filter_fields'] = ['id', 'a.id', 'state', 'a.state', 'ordering', 'a.ordering', 'created_by', 'a.created_by', 'modified_by', 'a.modified_by', 'extension_id', 'a.extension_id', 'filename', 'a.filename'];
         }
 
         parent::__construct($config);
@@ -60,9 +61,9 @@ class ExtensionimagesModel extends ListModel
     /**
      * Build an SQL query to load the list data.
      *
-     * @return   QueryInterface
+     * @return QueryInterface
      *
-     * @since   4.0.0
+     * @since 4.0.0
      */
     protected function getListQuery(): QueryInterface
     {
@@ -79,7 +80,7 @@ class ExtensionimagesModel extends ListModel
         $query->select("uc.name AS uEditor");
         $query->join("LEFT", "#__users AS uc ON uc.id=a.checked_out");
         if (jedHelper::isAdminOrSuperUser()) {
-            $query->where("a.created_by = " . JedHelper::getUser()->get("id"));
+            $query->where("a.created_by = " . Factory::getApplication()->getIdentity()->id);
         }
 
         // Join over the user field 'created_by'
@@ -133,11 +134,11 @@ class ExtensionimagesModel extends ListModel
      * different modules that might need different sets of data or different
      * ordering requirements.
      *
-     * @param   string  $id  A prefix for the store id.
+     * @param string $id A prefix for the store id.
      *
-     * @return  string A store id.
+     * @return string A store id.
      *
-     * @since   4.0.0
+     * @since 4.0.0
      */
     protected function getStoreId($id = ''): string
     {
@@ -150,21 +151,20 @@ class ExtensionimagesModel extends ListModel
     }
 
     /**
-     * Method to auto-populate the model state.
+     * Method to autopopulate the model state.
      *
      * Note. Calling getState in this method will result in recursion.
      *
-     * @param   string  $ordering   Elements order
-     * @param   string  $direction  Order direction
+     * @param string $ordering  Elements order
+     * @param string $direction Order direction
      *
      * @return void
      *
      * @throws Exception
      *
      * @since 4.0.0
-     *
      */
-    protected function populateState($ordering = null, $direction = null)
+    protected function populateState($ordering = null, $direction = null): void
     {
         // List state information.
         parent::populateState('id', 'ASC');
